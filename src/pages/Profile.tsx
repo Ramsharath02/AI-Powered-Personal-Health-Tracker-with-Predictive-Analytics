@@ -113,12 +113,25 @@ const Profile: React.FC = () => {
   };
 
 
-  const handleAvatarClick = () => {
-    if (avatarInputRef.current) {
-      avatarInputRef.current.click();
-    }
-  };
+ const handleAvatarClick = () => {
+  avatarInputRef.current?.click(); // Trigger file input
+};
+
   
+ useEffect(() => {
+    const checkBucket = async () => {
+      const { data, error } = await supabase.storage.from('avatars').list('');
+      if (error) {
+        console.error('Bucket not found or error:', error.message);
+      } else {
+        console.log('Bucket found. Available items:', data);
+      }
+    };
+
+    checkBucket();
+  }, []); // ✅ Run only once when component mounts
+
+
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
@@ -130,35 +143,64 @@ const Profile: React.FC = () => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`; // Unique filename
-      const filePath = `avatars/${fileName}`;
+      const filePath = `${fileName}`; 
+
   
       // Upload image to Supabase Storage
       const { data, error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-  
-      if (uploadError) throw uploadError;
-  
-      if (!data) throw new Error("Failed to upload image.");
-  
+      .from('avatars')
+      .upload(filePath, file, {
+        contentType: file.type, // Correct content type
+        upsert: true,
+      });
+    
+    if (uploadError || !data) {
+      throw new Error(uploadError?.message || 'Failed to upload image.');
+    }
+    
       // ✅ Get the public URL from Supabase
-      const { data: publicURLData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-        
-      const avatarURL = publicURLData.publicUrl;
+       const { data: publicData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    if (!publicData || !publicData.publicUrl) {
+      throw new Error('Failed to retrieve public URL.');
+    }
+
+    // ✅ Assign correct URL
+    const avatarURL = publicData.publicUrl;
+
+    
+    
+       // ✅ Check the files in the 'avatars' bucket
+    const { data: fileList, error: listError } = await supabase.storage
+      .from('avatars')
+      .list('');
+
+    if (listError) {
+      console.error('Error fetching file list:', listError.message);
+    } else {
+      console.log('Files in avatars bucket:', fileList);
+    }
+
   
       // ✅ Update user's profile with the new avatar
       const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: avatarURL })
-        .eq('id', user.id);
-  
-      if (updateError) throw updateError;
-  
+      .from('profiles')
+      .update({ avatar_url: avatarURL })
+      .eq('id', user.id);
+    
+    if (updateError) {
+      console.error('Error updating profile:', updateError.message);
+      throw updateError;
+    }
+    
       // ✅ Update state so the image appears in UI
-      setFormData((prev) => ({ ...prev, avatar_url: avatarURL }));
-  
+      setFormData((prev) => ({
+        ...prev,
+        avatar_url: `${avatarURL}?t=${Date.now()}`, // Prevents browser caching issues
+      }));
+      
       setSuccess("Avatar updated successfully!");
     } catch (error) {
       setError(error instanceof Error ? error.message : "An unexpected error occurred.");
@@ -172,46 +214,57 @@ const Profile: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
-
+    if (!user || !user.id) {
+      setError("User not found or ID is missing.");
+      return;
+    }
     setUpdating(true);
     setError(null);
     setSuccess(null);
 
     try {
+      // Filter out null values to avoid sending unnecessary fields
+      const validFormData: { [key: string]: any } = Object.fromEntries(
+        Object.entries({
+          full_name: formData.full_name || null,
+          bio: formData.bio || null,
+          location: formData.location || null,
+          phone: formData.phone || null,
+          height: formData.height || null,
+          weight: formData.weight || null,
+          birthdate: formData.birthdate || null,
+          gender: formData.gender || null,
+          fitness_goal: formData.fitness_goal || "maintain",
+          updated_at: new Date().toISOString(),
+        }).filter(([_, value]) => value !== null)
+      );
+  
+      console.log("Filtered FormData being sent:", validFormData); // ✅ Check before sending
+  
       const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: formData.full_name,
-          bio: formData.bio,
-          location: formData.location,
-          phone: formData.phone,
-          height: formData.height,
-          weight: formData.weight,
-          birthdate: formData.birthdate,
-          gender: formData.gender,
-          fitness_goal: formData.fitness_goal,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+        .from("profiles")
+        .update(validFormData)
+        .eq("id", user.id);
+  
+      if (error) {
+        throw error; // Error handling if update fails
+      }
+       
+      console.log("User ID:", user.id);
 
-      if (error) throw error;
-      
-      setSuccess('Profile updated successfully');
-      
-      setProfile(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          ...formData,
-          updated_at: new Date().toISOString()
-        };
-      });
+  
+      // ✅ Success - Show confirmation message
+      setSuccess("Profile updated successfully");
+  
+      // ✅ Update local profile state
+     
     } catch (error) {
+      // Error handling
       if (error instanceof Error) {
+        console.error("Error updating profile:", error.message);
         setError(error.message);
       } else {
-        setError('An unexpected error occurred');
+        setError("An unexpected error occurred.");
       }
     } finally {
       setUpdating(false);
@@ -601,15 +654,21 @@ const Profile: React.FC = () => {
   className="h-24 w-24 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 relative group cursor-pointer"
   onClick={handleAvatarClick} // Ensure it's used here
 >
-    {formData.avatar_url ? (
-      <img 
-        src={formData.avatar_url} 
-        alt={formData.full_name || 'User'} 
-        className="h-24 w-24 rounded-full object-cover"
-      />
-    ) : (
-      <User className="h-12 w-12" />
-    )}
+{formData.avatar_url ? (
+  <img
+    src={`${formData.avatar_url}?t=${Date.now()}`}
+    alt={formData.full_name || 'User'}
+    className="h-24 w-24 rounded-full object-cover"
+  />
+) : (
+  <img
+    src="/default-avatar.png" // Use fallback avatar
+    alt="Default Avatar"
+    className="h-24 w-24 rounded-full object-cover"
+  />
+)}
+
+
 
     {/* Hover Effect for Upload */}
     <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
