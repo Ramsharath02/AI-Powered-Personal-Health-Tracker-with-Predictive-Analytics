@@ -120,11 +120,11 @@ const Profile: React.FC = () => {
   
  useEffect(() => {
     const checkBucket = async () => {
-      const { data, error } = await supabase.storage.from('avatars').list('');
+      const { error } = await supabase.storage.from('avatars').list('');
       if (error) {
-        console.error('Bucket not found or error:', error.message);
+        //console.error('Bucket not found or error:', error.message);
       } else {
-        console.log('Bucket found. Available items:', data);
+        //console.log('Bucket found. Available items:', data);
       }
     };
 
@@ -173,14 +173,14 @@ const Profile: React.FC = () => {
     
     
        // ✅ Check the files in the 'avatars' bucket
-    const { data: fileList, error: listError } = await supabase.storage
+    const {  error: listError } = await supabase.storage
       .from('avatars')
       .list('');
 
     if (listError) {
-      console.error('Error fetching file list:', listError.message);
+      //console.error('Error fetching file list:', listError.message);
     } else {
-      console.log('Files in avatars bucket:', fileList);
+      //console.log('Files in avatars bucket:', fileList);
     }
 
   
@@ -191,7 +191,7 @@ const Profile: React.FC = () => {
       .eq('id', user.id);
     
     if (updateError) {
-      console.error('Error updating profile:', updateError.message);
+      //console.error('Error updating profile:', updateError.message);
       throw updateError;
     }
     
@@ -239,7 +239,7 @@ const Profile: React.FC = () => {
         }).filter(([_, value]) => value !== null)
       );
   
-      console.log("Filtered FormData being sent:", validFormData); // ✅ Check before sending
+      //console.log("Filtered FormData being sent:", validFormData); // ✅ Check before sending
   
       const { error } = await supabase
         .from("profiles")
@@ -250,7 +250,7 @@ const Profile: React.FC = () => {
         throw error; // Error handling if update fails
       }
        
-      console.log("User ID:", user.id);
+      //console.log("User ID:", user.id);
 
   
       // ✅ Success - Show confirmation message
