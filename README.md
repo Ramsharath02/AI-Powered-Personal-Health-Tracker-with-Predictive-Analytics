@@ -68,7 +68,7 @@ git clone https://github.com/Ramsharath02/AI-Powered-Personal-Health-Tracker-wit
 
 
 --- 
-### 📦 Install Dependencies
+## 📦 Install Dependencies
 ```
 Navigate to the project directory:
 
@@ -81,10 +81,9 @@ npm install
 yarn install
 
 ⚡ Run the Application
-bash
-Copy
-Edit
+
 npm run dev
 # OR
 yarn dev
+
 The app will run on http://localhost:5173/.
