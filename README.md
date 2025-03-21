@@ -67,22 +67,19 @@ To run the application locally, follow these steps:
 git clone https://github.com/Ramsharath02/AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics.git
 
 
-
-📦 Install Dependencies
+--- 
+### 📦 Install Dependencies
+```
 Navigate to the project directory:
 
-bash
-Copy
-Edit
 cd AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics
+
 Install all dependencies:
 
-bash
-Copy
-Edit
 npm install
 # OR
 yarn install
+
 ⚡ Run the Application
 bash
 Copy
