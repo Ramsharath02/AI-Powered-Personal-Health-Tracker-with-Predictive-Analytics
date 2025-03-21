@@ -106,7 +106,7 @@ VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ## 🛢️ Supabase Integration
 This project uses Supabase for backend and authentication.
 
-###✅ Setup Supabase
+### ✅ Setup Supabase
 - Go to Supabase and create an account.
 - Create a new project.
 - Get your API URL and Anon Key from the Supabase project settings.
