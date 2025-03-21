@@ -67,23 +67,28 @@ To run the application locally, follow these steps:
 git clone https://github.com/Ramsharath02/AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics.git
 
 
---- 
-## 📦 Install Dependencies
+ 
+
 ```
-Navigate to the project directory:
+#📦 Install Dependencies
+
+##Navigate to the project directory:
 
 cd AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics
 
-Install all dependencies:
+##Install all dependencies:
 
 npm install
-# OR
+   OR
 yarn install
 
-⚡ Run the Application
+#⚡ Run the Application
 
 npm run dev
-# OR
+ OR
 yarn dev
 
 The app will run on http://localhost:5173/.
+
+#🔐 Environment Variables
+Create a .env file in the root directory and configure the following:
