@@ -48,11 +48,26 @@ The **AI-Powered Personal Health Tracker** is built to help users monitor their 
 ---
 
 ## 📁 Folder Structure
-
-📦 AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics ├── 📁 node_modules ├── 📁 public │ ├── 📄 favicon.ico │ ├── 📄 logo.webp │ 
-└── 📄 index.html ├── 📁 src │ ├── 📁 assets │ ├── 📁 components │ ├── 📁 pages │ ├── 📁 styles │ ├── 📄 App.tsx │ 
-├── 📄 main.tsx │ └── 📄 index.css ├── 📄 .gitignore ├── 📄 package.json ├── 📄 tsconfig.json ├── 📄 vite.config.ts 
-├── 📄 tailwind.config.js └── 📄 postcss.config.js
+📦 AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics
+├── 📁 node_modules
+├── 📁 public
+│   ├── 📄 favicon.ico
+│   ├── 📄 logo.webp
+│   └── 📄 index.html
+├── 📁 src
+│   ├── 📁 assets
+│   ├── 📁 components
+│   ├── 📁 pages
+│   ├── 📁 styles
+│   ├── 📄 App.tsx
+│   ├── 📄 main.tsx
+│   └── 📄 index.css
+├── 📄 .gitignore
+├── 📄 package.json
+├── 📄 tsconfig.json
+├── 📄 vite.config.ts
+├── 📄 tailwind.config.js
+└── 📄 postcss.config.js
 
 
 ---
@@ -111,6 +126,51 @@ This project uses Supabase for backend and authentication.
 - Create a new project.
 - Get your API URL and Anon Key from the Supabase project settings.
 - Add these credentials to your .env file.
+
+## 📊 Supabase Database Schema
+### 🎯 1. profile Table
+```bash
+CREATE TABLE profile (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL,
+    name TEXT,
+    profile_pic TEXT,
+    created_at TIMESTAMP DEFAULT now()
+);
+```
+### 🎯 2. health_data Table
+```bash
+CREATE TABLE health_data (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    bmi FLOAT,
+    activity_level TEXT,
+    heart_rate INTEGER,
+    created_at TIMESTAMP DEFAULT now()
+);
+```
+
+## 🔐 Row-Level Security (RLS) Policies
+### ✅ profile Table Policy
+```bash
+ALTER TABLE profile ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated users can access their own profile"
+ON profile
+FOR SELECT, INSERT, UPDATE
+USING (auth.uid() = id);
+```
+
+### ✅ health_data Table Policy
+
+```bash
+ALTER TABLE health_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated users can manage their own health data"
+ON health_data
+FOR SELECT, INSERT, UPDATE
+USING (auth.uid() = user_id);
+```
 
 ## 🎯 API Endpoints
 ### User Authentication
