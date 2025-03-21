@@ -70,25 +70,30 @@ git clone https://github.com/Ramsharath02/AI-Powered-Personal-Health-Tracker-wit
  
 
 ```
-#📦 Install Dependencies
+---
+# 📦 Install Dependencies
 
-##Navigate to the project directory:
-
+## Navigate to the project directory:
+```bash
 cd AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics
+```
 
-##Install all dependencies:
-
+## Install all dependencies:
+```bash
 npm install
    OR
 yarn install
+```
+---
 
-#⚡ Run the Application
-
+# ⚡ Run the Application
+```bash
 npm run dev
  OR
 yarn dev
+```
 
 The app will run on http://localhost:5173/.
 
-#🔐 Environment Variables
+# 🔐 Environment Variables
 Create a .env file in the root directory and configure the following:
