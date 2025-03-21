@@ -71,14 +71,14 @@ git clone https://github.com/Ramsharath02/AI-Powered-Personal-Health-Tracker-wit
 
 ```
 ---
-# 📦 Install Dependencies
+## 📦 Install Dependencies
 
-## Navigate to the project directory:
+### Navigate to the project directory:
 ```bash
 cd AI-Powered-Personal-Health-Tracker-with-Predictive-Analytics
 ```
 
-## Install all dependencies:
+### Install all dependencies:
 ```bash
 npm install
    OR
@@ -86,7 +86,7 @@ yarn install
 ```
 ---
 
-# ⚡ Run the Application
+## ⚡ Run the Application
 ```bash
 npm run dev
  OR
@@ -95,5 +95,53 @@ yarn dev
 
 The app will run on http://localhost:5173/.
 
-# 🔐 Environment Variables
+## 🔐 Environment Variables
 Create a .env file in the root directory and configure the following:
+```bash
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+```
+
+## 🛢️ Supabase Integration
+This project uses Supabase for backend and authentication.
+
+###✅ Setup Supabase
+- Go to Supabase and create an account.
+- Create a new project.
+- Get your API URL and Anon Key from the Supabase project settings.
+- Add these credentials to your .env file.
+
+## 🎯 API Endpoints
+### User Authentication
+- POST /auth/signin - Sign in user
+- POST /auth/signup - Register user
+- POST /auth/logout - Logout user
+### Health Data Management
+- GET /health-data - Retrieve user health data
+- POST /health-data - Add health data
+- PUT /health-data/:id - Update health data
+- DELETE /health-data/:id - Delete health data
+
+## MIT License
+
+Copyright (c) [2025] [Ramsharath.S]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
