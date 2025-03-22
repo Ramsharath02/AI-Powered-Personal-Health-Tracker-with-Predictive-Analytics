@@ -33,6 +33,9 @@ const Profile: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState('profile');
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const googleAvatarUrl = user?.user_metadata?.avatar_url || '';
+
+
 
   const [formData, setFormData] = useState({
     full_name: '',
@@ -70,7 +73,7 @@ const Profile: React.FC = () => {
           setProfile(data);
           setFormData({
             full_name: data.full_name || '',
-            avatar_url: data.avatar_url || '',
+            avatar_url: data.avatar_url || googleAvatarUrl ||'',
             bio: data.bio || '',
             location: data.location || '',
             phone: data.phone || '',
@@ -84,8 +87,8 @@ const Profile: React.FC = () => {
           const newProfile: UserProfile = {
             id: user.id,
             email: user.email || "",
-            full_name: '',
-            avatar_url: '',
+            full_name: user.user_metadata?.full_name || '', // ✅ Use Google name if available
+            avatar_url: googleAvatarUrl || '', // ✅ Added Google avatar fallback
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
@@ -159,9 +162,11 @@ const Profile: React.FC = () => {
     }
     
       // ✅ Get the public URL from Supabase
-       const { data: publicData } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
+      const { data: publicData } = supabase.storage
+  .from('avatars')
+  .getPublicUrl(filePath);
+
+
 
     if (!publicData || !publicData.publicUrl) {
       throw new Error('Failed to retrieve public URL.');
@@ -198,7 +203,7 @@ const Profile: React.FC = () => {
       // ✅ Update state so the image appears in UI
       setFormData((prev) => ({
         ...prev,
-        avatar_url: `${avatarURL}?t=${Date.now()}`, // Prevents browser caching issues
+        avatar_url: avatarURL,
       }));
       
       setSuccess("Avatar updated successfully!");
@@ -218,6 +223,24 @@ const Profile: React.FC = () => {
       setError("User not found or ID is missing.");
       return;
     }
+     // ✅ Validation checks
+  if (!formData.full_name.trim()) {
+    setError("Full name is required.");
+    setUpdating(false);
+    return;
+  }
+
+  if (!formData.phone.trim()) {
+    setError("Phone number is required.");
+    setUpdating(false);
+    return;
+  }
+
+  if (!formData.location.trim()) {
+    setError("Location is required.");
+    setUpdating(false);
+    return;
+  }
     setUpdating(true);
     setError(null);
     setSuccess(null);
@@ -654,18 +677,23 @@ const Profile: React.FC = () => {
   className="h-24 w-24 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 relative group cursor-pointer"
   onClick={handleAvatarClick} // Ensure it's used here
 >
-{formData.avatar_url ? (
+{formData.avatar_url && formData.avatar_url !== '' ?(
   <img
     src={`${formData.avatar_url}?t=${Date.now()}`}
-    alt={formData.full_name || 'User'}
+    alt="User Avatar"
     className="h-24 w-24 rounded-full object-cover"
   />
+) :formData.full_name ? (
+  <div className="h-24 w-24 rounded-full bg-purple-500 text-white flex items-center justify-center text-2xl font-semibold">
+    {formData.full_name.charAt(0).toUpperCase()}
+  </div>
 ) : (
   <img
     src="/default-avatar.png" // Use fallback avatar
     alt="Default Avatar"
     className="h-24 w-24 rounded-full object-cover"
   />
+
 )}
 
 
